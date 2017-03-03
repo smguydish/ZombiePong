@@ -61,9 +61,10 @@ namespace ZombiePong
 
             paddle1 = new Sprite(new Vector2(20, 20), spritesheet, new Rectangle(0, 516, 25, 150), Vector2.Zero);
             paddle2 = new Sprite(new Vector2(970, 20), spritesheet, new Rectangle(32, 516, 25, 150), Vector2.Zero);
-            ball = new Sprite(new Vector2(700, 350), spritesheet, new Rectangle(76, 510, 40, 40), new Vector2(30, 0));
+            ball = new Sprite(new Vector2(700, 350), spritesheet, new Rectangle(76, 510, 40, 40), new Vector2(250, -100));
 
-            SpawnZombie(new Vector2(400, 400), new Vector2(-20, 0));
+            SpawnZombie(new Vector2(400, 400), new Vector2(-45, 0));
+            SpawnZombie(new Vector2(420, 300), new Vector2(50, 0));
         }
 
         /// <summary>
@@ -104,11 +105,53 @@ namespace ZombiePong
             for (int i = 0; i < zombies.Count; i++)
             {
                 zombies[i].Update(gameTime);
+                // Zombie logic goes here..
 
-                // Zombie logic goes here.. 
-                zombies[i].FlipHorizontal = false;
+                if (zombies[i].Location.X >= 875)
+                {
+                    zombies[i].FlipHorizontal = false;
+                    zombies[i].Velocity *= new Vector2(-1, 1);
+                }
+
+                if (zombies[i].Location.X <= 0)
+                {
+                    zombies[i].FlipHorizontal = true;
+                    zombies[i].Velocity *= new Vector2(-1, 1);
+                }
+
+                if (zombies[i].Velocity.X > 0)
+                {
+                    zombies[i].FlipHorizontal = true;
+                }
+
+                else
+                    zombies[i].FlipHorizontal = false;
             }
 
+            paddle2.Location = new Vector2(paddle2.Location.X, ball.Center.Y - 75);
+
+            if (paddle2.IsBoxColliding(ball.BoundingBoxRect))
+            {
+                ball.Velocity *= new Vector2(-1, 1);
+            }
+
+            else if (paddle1.IsBoxColliding(ball.BoundingBoxRect))
+            {
+                ball.Velocity *= new Vector2(-1, 1);
+            }
+            
+            else if (ball.Location.Y < 0)
+            {
+                ball.Velocity *= new Vector2(1, -1);
+            }
+
+            else if (ball.Location.Y > 725)
+            {
+                ball.Velocity *= new Vector2(1, -1);
+            }
+
+            MouseState ms = Mouse.GetState();
+            paddle1.Location = new Vector2(paddle1.Location.X, (float)ms.Y - 75);
             base.Update(gameTime);
         }
 
