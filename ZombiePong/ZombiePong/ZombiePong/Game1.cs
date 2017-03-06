@@ -61,10 +61,12 @@ namespace ZombiePong
 
             paddle1 = new Sprite(new Vector2(20, 20), spritesheet, new Rectangle(0, 516, 25, 150), Vector2.Zero);
             paddle2 = new Sprite(new Vector2(970, 20), spritesheet, new Rectangle(32, 516, 25, 150), Vector2.Zero);
-            ball = new Sprite(new Vector2(700, 350), spritesheet, new Rectangle(76, 510, 40, 40), new Vector2(250, -100));
+            ball = new Sprite(new Vector2(700, 350), spritesheet, new Rectangle(76, 510, 40, 40), new Vector2(350, -150));
 
-            SpawnZombie(new Vector2(400, 400), new Vector2(-45, 0));
+            SpawnZombie(new Vector2(10, 600), new Vector2(-45, 0));
             SpawnZombie(new Vector2(420, 300), new Vector2(50, 0));
+            SpawnZombie(new Vector2(100, 10), new Vector2(60, 0));
+
         }
 
         /// <summary>
@@ -123,9 +125,15 @@ namespace ZombiePong
                 {
                     zombies[i].FlipHorizontal = true;
                 }
-
+                
                 else
                     zombies[i].FlipHorizontal = false;
+
+                if (ball.IsBoxColliding(zombies[i].BoundingBoxRect))
+                {
+                    ball.Velocity *= new Vector2(-1, 1);
+                    ball.FlipHorizontal = true;
+                }
             }
 
             paddle2.Location = new Vector2(paddle2.Location.X, ball.Center.Y - 75);
@@ -133,11 +141,13 @@ namespace ZombiePong
             if (paddle2.IsBoxColliding(ball.BoundingBoxRect))
             {
                 ball.Velocity *= new Vector2(-1, 1);
+                ball.FlipHorizontal = true;
             }
 
             else if (paddle1.IsBoxColliding(ball.BoundingBoxRect))
             {
                 ball.Velocity *= new Vector2(-1, 1);
+                ball.FlipHorizontal = false;
             }
             
             else if (ball.Location.Y < 0)
@@ -149,10 +159,14 @@ namespace ZombiePong
             {
                 ball.Velocity *= new Vector2(1, -1);
             }
-
             MouseState ms = Mouse.GetState();
             paddle1.Location = new Vector2(paddle1.Location.X, (float)ms.Y - 75);
             base.Update(gameTime);
+
+            if (ball.Location.X <= 0)
+            {
+                ball = new Sprite(new Vector2(500, 350), spritesheet, new Rectangle(76, 510, 40, 40), new Vector2(250, -100));
+            }
         }
 
         /// <summary>
