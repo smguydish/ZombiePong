@@ -26,7 +26,7 @@ namespace ZombiePong
         int Score1, Score2;
 
         float ballSpeed = 180;
-        
+        Random rand = new Random(System.Environment.TickCount);
 
 
         public Game1()
@@ -65,7 +65,7 @@ namespace ZombiePong
             spritesheet = Content.Load<Texture2D>("spritesheet");
 
             paddle1 = new Sprite(new Vector2(20, 20), spritesheet, new Rectangle(0, 516, 25, 150), Vector2.Zero);
-            paddle2 = new Sprite(new Vector2(970, 20), spritesheet, new Rectangle(32, 516, 25, 150), new Vector2(0, 75));
+            paddle2 = new Sprite(new Vector2(970, 20), spritesheet, new Rectangle(32, 516, 25, 150), new Vector2(0, 400));
             ball = new Sprite(new Vector2(700, 350), spritesheet, new Rectangle(76, 510, 40, 40), new Vector2(350, -150));
 
             SpawnZombie(new Vector2(10, 600), new Vector2(-45, 0));
@@ -89,7 +89,7 @@ namespace ZombiePong
 
         public void SpawnZombie(Vector2 location, Vector2 velocity)
         {
-            Sprite zombie = new Sprite(location, spritesheet, new Rectangle(0, 25, 160, 150), velocity);
+            Sprite zombie = new Sprite(location, spritesheet, new Rectangle(0, 25, 155, 145), velocity);
 
             for (int i = 1; i < 10; i++)
             {
@@ -147,15 +147,11 @@ namespace ZombiePong
                 }
             }
 
-            if(paddle2.Location.Y < 100)
+            if (rand.Next(0, 400) < 100)
             {
-                paddle2.Velocity *= new Vector2(-1, 1);
+                paddle2.Velocity = new Vector2(0, ball.Center.Y - paddle2.Center.Y);
             }
-
-            if (paddle2.Location.Y > 725)
-            {
-                paddle2.Velocity *= new Vector2(-1, 1);
-            }
+            
 
             if (paddle2.IsBoxColliding(ball.BoundingBoxRect))
             {
@@ -195,6 +191,27 @@ namespace ZombiePong
                 ballSpeed = 350;
             }
 
+            if (ball.Location.X >= 1000)
+            {
+                Score1 = Score1 + 1;
+                ball = new Sprite(new Vector2(500, 350), spritesheet, new Rectangle(76, 510, 40, 40), new Vector2(250, -100));
+                ballSpeed = 350;
+            }
+
+            if (paddle2.IsBoxColliding(ball.BoundingBoxRect))
+            {
+                ball.Velocity *= new Vector2(-1, 1);
+                ball.Location = new Vector2(paddle2.Location.X - paddle2.BoundingBoxRect.Width, ball.Location.Y);
+            }
+            if (paddle1.IsBoxColliding(ball.BoundingBoxRect))
+            {
+                ball.Velocity *= new Vector2(-1, 1);
+                ball.Location = new Vector2(paddle1.Location.X + paddle1.BoundingBoxRect.Width, ball.Location.Y);
+            }
+
+            paddle1.Location = new Vector2(paddle1.Location.X, MathHelper.Clamp(ms.Y, 0, this.Window.ClientBounds.Height - paddle1.BoundingBoxRect.Height));
+            paddle2.Location = new Vector2(paddle2.Location.X, MathHelper.Clamp(paddle2.Location.Y, 0, this.Window.ClientBounds.Height - paddle2.BoundingBoxRect.Height));
+            paddle2.Update(gameTime);
         }
 
         /// <summary>
