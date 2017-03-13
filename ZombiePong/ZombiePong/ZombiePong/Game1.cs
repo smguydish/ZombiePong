@@ -66,7 +66,7 @@ namespace ZombiePong
 
             paddle1 = new Sprite(new Vector2(20, 20), spritesheet, new Rectangle(0, 516, 25, 150), Vector2.Zero);
             paddle2 = new Sprite(new Vector2(970, 20), spritesheet, new Rectangle(32, 516, 25, 150), new Vector2(0, 400));
-            ball = new Sprite(new Vector2(700, 350), spritesheet, new Rectangle(76, 510, 40, 40), new Vector2(350, -150));
+            ball = new Sprite(new Vector2(700, 350), spritesheet, new Rectangle(76, 510, 40, 40), new Vector2(350, -125));
 
             SpawnZombie(new Vector2(10, 600), new Vector2(-45, 0));
             SpawnZombie(new Vector2(420, 300), new Vector2(50, 0));
@@ -74,6 +74,8 @@ namespace ZombiePong
 
             Score1 = 0;
             Score2 = 0;
+
+           
 
             
         }
@@ -143,30 +145,63 @@ namespace ZombiePong
                 if (ball.IsBoxColliding(zombies[i].BoundingBoxRect))
                 {
                     ball.Velocity *= new Vector2(-1, 1);
-                    ball.FlipHorizontal = true;
+                    
                 }
             }
 
-            if (rand.Next(0, 400) < 100)
-            {
-                paddle2.Velocity = new Vector2(0, ball.Center.Y - paddle2.Center.Y);
-            }
             
-
-            if (paddle2.IsBoxColliding(ball.BoundingBoxRect))
-            {
-                ball.Velocity *= new Vector2(-1, 1);
-                ball.FlipHorizontal = true;
-                ballSpeed += 50;
-            }
-
-            else if (paddle1.IsBoxColliding(ball.BoundingBoxRect))
-            {
-                ball.Velocity *= new Vector2(-1, 1);
-                ball.FlipHorizontal = false;
-                ballSpeed += 50;
-            }
             
+            paddle2.Velocity = new Vector2(0, ball.Center.Y - paddle2.Center.Y);
+
+
+
+           if (paddle2.IsBoxColliding(ball.BoundingBoxRect))
+           {
+                ballSpeed += 50;
+                if (ball.Center.Y > paddle1.Center.Y)
+               {
+                    
+
+                   if (ball.Velocity.Y < 0)
+                       ball.Velocity *= new Vector2(1, -1);
+                   else
+                       ball.Velocity *= new Vector2(-1, 1);
+               }
+               else
+               {
+                   if (ball.Velocity.Y < 0)
+                       ball.Velocity *= new Vector2(-1, 1);
+                   else
+                       ball.Velocity *= new Vector2(-1, -1);
+               }
+            
+            
+               ball.Location = new Vector2(paddle2.Location.X - ball.BoundingBoxRect.Width, ball.Location.Y);
+           }
+        
+           if (paddle1.IsBoxColliding(ball.BoundingBoxRect))
+           {
+                ballSpeed += 50;
+                if (ball.Center.Y > paddle1.Center.Y)
+               {
+                    
+
+                   if (ball.Velocity.Y < 0)
+                       ball.Velocity *= new Vector2(-1, -1);
+                   else
+                       ball.Velocity *= new Vector2(-1, 1);
+               }
+               else
+               {
+                   if (ball.Velocity.Y < 0)
+                       ball.Velocity *= new Vector2(-1, 1);
+                   else
+                       ball.Velocity *= new Vector2(-1, -1);
+               }
+
+                ball.Location = new Vector2(paddle1.Location.X + paddle1.BoundingBoxRect.Width, ball.Location.Y);
+            }
+
             else if (ball.Location.Y < 0)
             {
                 ball.Velocity *= new Vector2(1, -1);
@@ -212,6 +247,13 @@ namespace ZombiePong
             paddle1.Location = new Vector2(paddle1.Location.X, MathHelper.Clamp(ms.Y, 0, this.Window.ClientBounds.Height - paddle1.BoundingBoxRect.Height));
             paddle2.Location = new Vector2(paddle2.Location.X, MathHelper.Clamp(paddle2.Location.Y, 0, this.Window.ClientBounds.Height - paddle2.BoundingBoxRect.Height));
             paddle2.Update(gameTime);
+
+            if (Score1 >= Score2 + 3 || Score2 >= Score1 + 3)
+            {
+                background = Content.Load<Texture2D>("redBG");
+            }
+            else
+                background = Content.Load<Texture2D>("background");
         }
 
         /// <summary>
